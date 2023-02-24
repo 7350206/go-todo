@@ -13,7 +13,8 @@ import (
 	"os/exec"       // exec external commands
 	"path/filepath" // deal with directory path
 	"runtime"       // identify running os
-	"strings"       // compare strings
+
+	// "strings"       // compare strings
 	"testing"
 )
 
@@ -60,7 +61,8 @@ func TestTodoCLItask(t *testing.T) {
 	// ensure tool can add new task via t.Run
 	t.Run("Add new task", func(t *testing.T) {
 		// execute binary with splitted task var
-		cmd := exec.Command(cmdPath, strings.Split(task, " ")...)
+		// cmd := exec.Command(cmdPath, strings.Split(task, " ")...)
+		cmd := exec.Command(cmdPath, "-task", task)
 
 		if err := cmd.Run(); err != nil {
 			t.Fatal(err)
@@ -69,8 +71,8 @@ func TestTodoCLItask(t *testing.T) {
 
 	// ensure tool can list tasks
 	t.Run("List tasks", func(t *testing.T) {
-		cmd := exec.Command(cmdPath)
-
+		// cmd := exec.Command(cmdPath)
+		cmd := exec.Command(cmdPath, "-list")
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			t.Fatal(err)
