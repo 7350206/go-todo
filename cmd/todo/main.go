@@ -12,24 +12,49 @@
 package main
 
 import (
+	"bufio" //read data from the STDIN input stream
 	"flag"
 	"fmt"
+	"io" //use the io.Reader interface
 	"os"
 
-	// "strings" // no need anymore
+	"strings" // join command-line arguments to compose a task name
 	"todo"
 )
 
-// hardcode for now
-// const todoFileName = ".todo.json"
-
-// will use env var for that
+// if env var is empty
 var todoFileName = ".todo.json"
+
+// getTask decides where to get the description for a new task from:
+// args or STDIN
+// [variadic function](https://go.dev/ref/spec#Function_types)
+// if any arguments were provided as the parameter args.
+// if yes, returns all of them concatenated with a " "
+// if no - uses the bufio.Scanner to scan for a single input line
+// on the provided io.Reader interface.
+func getTask(r io.Reader, args ...string) (string, error) {
+	if len(args) > 0 {
+		return strings.Join(args, " "), nil
+	}
+
+	s := bufio.NewScanner(r)
+	s.Scan()
+	if err := s.Err(); err != nil {
+		return "", err
+	}
+
+	if len(s.Text()) == 0 {
+		return "", fmt.Errorf("task cannot be empty")
+	}
+
+	return s.Text(), nil
+}
 
 func main() {
 
 	// assigned vars are pointers, need to be dereferenced by *
 	task := flag.String("task", "", "task to be included in list")
+	add := flag.Bool("add", false, "add task to list")
 	list := flag.Bool("list", false, "list all tasks")
 	complete := flag.Int("complete", 0, "Item to be complete")
 
@@ -40,8 +65,6 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	// get file name to save todos
-	// to check later: export​​ ​​TODO_FILENAME=new-todo.json
 	if os.Getenv("TODO_FILENAME") != "" {
 		todoFileName = os.Getenv("TODO_FILENAME")
 	}
@@ -97,6 +120,26 @@ func main() {
 	case *task != "": // ad new task
 		l.Add(*task)
 		// and save
+		if err := l.Save(todoFileName); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+	// when any args (excluding flags) are provided
+	// they will be used as new task
+	case *add:
+		// can use the os.Stdin as the 1st param cuz
+		// its type *os.File implements the io.Reader interface.
+		// flag.Args returns all the remaining non-flag arguments
+		// use ... to expand the slice into a list of vals as expected by the func.
+		t, err := getTask(os.Stdin, flag.Args()...)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		l.Add(t)
+
+		// save
 		if err := l.Save(todoFileName); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

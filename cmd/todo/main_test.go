@@ -9,6 +9,7 @@ package main
 
 import (
 	"fmt"
+	"io" // use the function io.WriteString to write a string to an io.Writer:
 	"os"
 	"os/exec"       // exec external commands
 	"path/filepath" // deal with directory path
@@ -62,7 +63,23 @@ func TestTodoCLItask(t *testing.T) {
 	t.Run("Add new task", func(t *testing.T) {
 		// execute binary with splitted task var
 		// cmd := exec.Command(cmdPath, strings.Split(task, " ")...)
-		cmd := exec.Command(cmdPath, "-task", task)
+		cmd := exec.Command(cmdPath, "-add", task)
+
+		if err := cmd.Run(); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	// verify for adding from STDIN
+	task2 := "test task #2"
+	t.Run("AddNewTaskFromSTDIN", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-add")
+		cmdStdIn, err := cmd.StdinPipe()
+		if err != nil {
+			t.Fatal(err)
+		}
+		io.WriteString(cmdStdIn, task2)
+		cmdStdIn.Close()
 
 		if err := cmd.Run(); err != nil {
 			t.Fatal(err)
@@ -79,7 +96,8 @@ func TestTodoCLItask(t *testing.T) {
 		}
 
 		// expected := task + "\n"
-		expected := fmt.Sprintf("[ ] 1: %s\n", task)
+		// expected := fmt.Sprintf("[ ] 1: %s\n", task)
+		expected := fmt.Sprintf("[ ] 1: %s\n[ ] 2: %s\n", task, task2)
 
 		if expected != string(out) {
 			t.Errorf("expected %q, got %q instead \n", expected, string(out))
