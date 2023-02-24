@@ -27,6 +27,24 @@ type item struct {
 
 type List []item
 
+// string prints out a formatted list
+// implements a fmt.Stringer interface
+func (l *List) String() string {
+	formatted := ""
+
+	// k - item numner
+	for k, t := range *l {
+		prefix := "[ ] "
+		if t.Done {
+			prefix = "[X] "
+		}
+		// make k print numbers from 1 instead of 0
+		formatted += fmt.Sprintf("%s%d: %s\n", prefix, k+1, t.Task)
+
+	}
+	return formatted
+}
+
 /*
 	CREATES NEW TODO ITEM AND ADDS IT TO THE LIST OF ITEMS
 
