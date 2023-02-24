@@ -34,6 +34,12 @@ func main() {
 	complete := flag.Int("complete", 0, "Item to be complete")
 
 	flag.Parse()
+
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "usage of %s info: ", os.Args[0])
+		flag.PrintDefaults()
+	}
+
 	// fmt.Println("task", task) //task 0xc0000962c0
 
 	// extract the address of an empty instance of todo.List.
@@ -57,7 +63,11 @@ func main() {
 	case *list:
 		// list items
 		for _, item := range *l {
-			fmt.Println(item.Task)
+
+			// show only pending tasks
+			if !item.Done {
+				fmt.Println(item.Task)
+			}
 		}
 
 	// -------- complete flag
@@ -83,8 +93,8 @@ func main() {
 
 	default:
 		// any flag provided
-		prompt := "proper use:\n -task [task name] add new task to task list,\n -list list all items,\n -complete [number] complete chosen task,\n "
-		fmt.Fprintln(os.Stderr, prompt)
+		// prompt := "proper use:\n -task [task name] add new task to task list,\n -list list all items,\n -complete [number] complete chosen task,\n "
+		fmt.Fprintln(os.Stderr, "invalid flag")
 		os.Exit(1)
 	}
 
