@@ -61,14 +61,21 @@ func main() {
 	switch {
 	// case len(os.Args) == 1: // no args, filename only
 	case *list:
-		// list items
-		for _, item := range *l {
+		// 1) list items
+		// for _, item := range *l {
 
-			// show only pending tasks
-			if !item.Done {
-				fmt.Println(item.Task)
-			}
-		}
+		// 	// show only pending tasks
+		// 	if !item.Done {
+		// 		fmt.Println(item.Task)
+		// 	}
+		// }
+
+		// 2) satisfying Stringer interface provide the type to any
+		// formatting function that expects a string
+		// can call the fmt.Print function, which requires no format specifier,
+		// as the format comes from the Stringer interface
+		// implemented by the l var of type todo.List.
+		fmt.Print(l) // l is *todo.List
 
 	// -------- complete flag
 	case *complete > 0: // default
