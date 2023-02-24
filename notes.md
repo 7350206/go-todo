@@ -21,3 +21,18 @@ type Stringer interface {
 ```
 
 Any types that implement the method `String, which returns a string`, satisfy the `Stringer` interface. By satisfying this interface, you can provide the type to any formatting function that expects a string.
+
+
+### easy file save
+inprove flexibility with env vars
+
+- another flag can be added to choise file to save/
+- use env var for that (avoid typing any time)
+
+`os` package provides functions to handle both the environment and env vars.
+will use `os.Getenv("TODO_FILENAME")` to retrieve the value of the environment var identified by the name `TODO_FILENAME.`
+
+`to check later: export​​ ​​TODO_FILENAME=new-todo.json`
+`go run ./main.go -task "check env"`
+`cat new-todo.json`
+
