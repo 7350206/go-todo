@@ -21,13 +21,13 @@ import (
 )
 
 // hardcode for now
-const todoFileName = ".todo.json"
+// const todoFileName = ".todo.json"
+
+// will use env var for that
+var todoFileName = ".todo.json"
 
 func main() {
-	// To define a new flag using the flag package,
-	// call the function corresponding to the flag type you want to define.
 
-	// parsing cli flags
 	// assigned vars are pointers, need to be dereferenced by *
 	task := flag.String("task", "", "task to be included in list")
 	list := flag.Bool("list", false, "list all tasks")
@@ -40,6 +40,12 @@ func main() {
 		flag.PrintDefaults()
 	}
 
+	// get file name to save todos
+	// to check later: export​​ ​​TODO_FILENAME=new-todo.json
+	if os.Getenv("TODO_FILENAME") != "" {
+		todoFileName = os.Getenv("TODO_FILENAME")
+	}
+
 	// fmt.Println("task", task) //task 0xc0000962c0
 
 	// extract the address of an empty instance of todo.List.
@@ -49,8 +55,6 @@ func main() {
 
 	// read items from file
 	if err := l.Get(todoFileName); err != nil {
-		// use the standard error (STDERR) output instead of the
-		// standard output (STDOUT) to display error messages
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
